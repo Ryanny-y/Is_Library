@@ -1,19 +1,78 @@
 package swings;
 
+import configuration.Conn;
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Dashboard extends javax.swing.JFrame {
 
+    private final Conn conDb = new Conn();
+
     public Dashboard() {
         initComponents();
-        
+
         setTitle("IS1A Library");
         getContentPane().setBackground(new Color(245, 245, 245));
-        total_books.setData("32", "src/images/book.png", "Total Books");
-        available_books.setData("32", "src/images/available.png", "Available Books");
-        pending_books.setData("32", "src/images/pending.png", "Pending Books");
-        borrowed_books.setData("32", "src/images/borrow.png", "Borrowed Books");
+        cardInit();
+        bookInit();
         setVisible(true);
+    }
+
+    private void cardInit() {
+        String query = "SELECT \n"
+                + "    COUNT(*) AS total_books,\n"
+                + "    COUNT(CASE WHEN status = 'available' THEN 1 END) AS available_books,\n"
+                + "    COUNT(CASE WHEN status = 'pending' THEN 1 END) AS pending_books,\n"
+                + "    COUNT(CASE WHEN status = 'borrowed' THEN 1 END) AS borrowed_books\n"
+                + "FROM books;";
+
+        try (Connection con = conDb.getConnection(); PreparedStatement pstmt = con.prepareStatement(query)) {
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                int t_books = rs.getInt("total_books");
+                int a_books = rs.getInt("available_books");
+                int p_books = rs.getInt("pending_books");
+                int b_books = rs.getInt("borrowed_books");
+
+                total_books.setData(String.valueOf(t_books), "src/images/book.png", "Total Books");
+                available_books.setData(String.valueOf(a_books), "src/images/available.png", "Available Books");
+                pending_books.setData(String.valueOf(p_books), "src/images/pending.png", "Pending Books");
+                borrowed_books.setData(String.valueOf(b_books), "src/images/borrow.png", "Borrowed Books");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private void bookInit() {
+        String query = "SELECT * FROM books";
+
+        try (Connection con = conDb.getConnection(); PreparedStatement pstmt = con.prepareStatement(query)) {
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String title = rs.getString("title");
+                String author = rs.getString("author");
+                int year_published = rs.getInt("year_published");
+                String status = rs.getString("status");
+                String created_at = rs.getString("created_at");
+
+                bookListTable1.addRow(new Object[]{id, title, author, year_published, status, created_at});
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     @SuppressWarnings("unchecked")
@@ -28,6 +87,9 @@ public class Dashboard extends javax.swing.JFrame {
         available_books = new swings.SummaryCard();
         pending_books = new swings.SummaryCard();
         borrowed_books = new swings.SummaryCard();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        bookListTable1 = new swings.BookListTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -61,7 +123,7 @@ public class Dashboard extends javax.swing.JFrame {
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(logoutBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30))
+                .addGap(18, 18, 18))
         );
         HeaderLayout.setVerticalGroup(
             HeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -80,6 +142,32 @@ public class Dashboard extends javax.swing.JFrame {
         Summaries.add(pending_books);
         Summaries.add(borrowed_books);
 
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(101, 45, 126));
+        jLabel2.setText("Books List");
+
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        bookListTable1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        bookListTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Title", "Author", "Status", "Year Published", "Created At", "Actions"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                true, false, false, false, false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(bookListTable1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -87,8 +175,11 @@ public class Dashboard extends javax.swing.JFrame {
             .addComponent(Header, javax.swing.GroupLayout.DEFAULT_SIZE, 995, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGap(24, 24, 24)
-                .addComponent(Summaries, javax.swing.GroupLayout.PREFERRED_SIZE, 940, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Summaries, javax.swing.GroupLayout.DEFAULT_SIZE, 957, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -96,7 +187,11 @@ public class Dashboard extends javax.swing.JFrame {
                 .addComponent(Header, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(Summaries, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(398, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -114,8 +209,11 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel Header;
     private javax.swing.JPanel Summaries;
     private swings.SummaryCard available_books;
+    private swings.BookListTable bookListTable1;
     private swings.SummaryCard borrowed_books;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton logoutBtn;
     private swings.SummaryCard pending_books;
     private swings.SummaryCard total_books;

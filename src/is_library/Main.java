@@ -4,6 +4,7 @@
  */
 package is_library;
 
+import swings.Dashboard;
 import swings.LoginPage;
 
 /**
@@ -17,7 +18,8 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        new LoginPage();
+//        new LoginPage();
+        new Dashboard();
     }
     
 }
