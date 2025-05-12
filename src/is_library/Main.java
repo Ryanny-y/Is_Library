@@ -4,7 +4,6 @@
  */
 package is_library;
 
-import swings.Dashboard;
 import swings.LoginPage;
 
 /**
@@ -13,13 +12,9 @@ import swings.LoginPage;
  */
 public class Main {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         // TODO code application logic here
-//        new LoginPage();
-        new Dashboard();
+        new LoginPage();
     }
     
 }
