@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.TableCellRenderer;
 
 public class Dashboard extends javax.swing.JFrame {
@@ -25,11 +26,11 @@ public class Dashboard extends javax.swing.JFrame {
         bookListTable1.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(this));
         setVisible(true);
     }
-    
+
     public void refetchBooks() {
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) bookListTable1.getModel();
         model.setRowCount(0);
-        
+
         bookInit();
     }
 
@@ -102,6 +103,7 @@ public class Dashboard extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         bookListTable1 = new swings.BookListTable();
         update_btn = new javax.swing.JButton();
+        customComboBox1 = new swings.CustomComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -208,6 +210,12 @@ public class Dashboard extends javax.swing.JFrame {
             }
         });
 
+        customComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                customComboBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -220,6 +228,8 @@ public class Dashboard extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(customComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(addBook_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(update_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -236,7 +246,8 @@ public class Dashboard extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(addBook_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(update_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(update_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(customComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
                 .addContainerGap())
@@ -259,9 +270,49 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void update_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_update_btnActionPerformed
         // TODO add your handling code here:
-       new UpdateBookStatus(this);
+        new UpdateBookStatus(this);
     }//GEN-LAST:event_update_btnActionPerformed
 
+    private void customComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customComboBox1ActionPerformed
+        // TODO add your handling code here:
+        String item_status = customComboBox1.getSelectedItem().toString();
+
+        if (item_status.equals("Sort By Status")) {
+            refetchBooks();
+        } else {
+            selectByStatus(item_status);
+        }
+    }//GEN-LAST:event_customComboBox1ActionPerformed
+
+    private void selectByStatus(String item_status) {
+        String query = "SELECT * FROM books WHERE status = ?";
+
+        try (Connection con = conDb.getConnection(); PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setString(1, item_status);
+            
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.isBeforeFirst()) { // Checks if there's at least one row
+                javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) bookListTable1.getModel();
+                model.setRowCount(0); // Clear existing rows
+
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    String title = rs.getString("title");
+                    String author = rs.getString("author");
+                    int year_published = rs.getInt("year_published");
+                    String status = rs.getString("status");
+                    String created_at = rs.getString("created_at");
+
+                    model.addRow(new Object[]{id, title, author, status, year_published, created_at});
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "No books found with that status.");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Header;
@@ -270,6 +321,7 @@ public class Dashboard extends javax.swing.JFrame {
     private swings.SummaryCard available_books;
     private swings.BookListTable bookListTable1;
     private swings.SummaryCard borrowed_books;
+    private swings.CustomComboBox customComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
