@@ -31,7 +31,7 @@ public class BookListTable extends JTable {
         setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                if(column == 4) {
+                if(column == 3) {
                     String strValue = value.toString();
                     JLabel label = new JLabel(strValue);
                     Color foreground = new Color(46, 204, 113);

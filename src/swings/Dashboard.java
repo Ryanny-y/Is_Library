@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.table.TableCellRenderer;
 
 public class Dashboard extends javax.swing.JFrame {
 
@@ -20,6 +21,8 @@ public class Dashboard extends javax.swing.JFrame {
         getContentPane().setBackground(new Color(245, 245, 245));
         cardInit();
         bookInit();
+        bookListTable1.getColumnModel().getColumn(6).setCellRenderer(new TableActionCellRender());
+        bookListTable1.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor());
         setVisible(true);
     }
 
@@ -67,7 +70,7 @@ public class Dashboard extends javax.swing.JFrame {
                 String status = rs.getString("status");
                 String created_at = rs.getString("created_at");
 
-                bookListTable1.addRow(new Object[]{id, title, author, year_published, status, created_at});
+                bookListTable1.addRow(new Object[]{id, title, author, status, year_published, created_at});
             }
         } catch (SQLException ex) {
             Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
@@ -88,6 +91,7 @@ public class Dashboard extends javax.swing.JFrame {
         pending_books = new swings.SummaryCard();
         borrowed_books = new swings.SummaryCard();
         jLabel2 = new javax.swing.JLabel();
+        addBook_btn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         bookListTable1 = new swings.BookListTable();
 
@@ -146,6 +150,20 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(101, 45, 126));
         jLabel2.setText("Books List");
 
+        addBook_btn.setBackground(new java.awt.Color(101, 45, 126));
+        addBook_btn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        addBook_btn.setForeground(new java.awt.Color(255, 255, 255));
+        addBook_btn.setText("Add Book");
+        addBook_btn.setBorder(null);
+        addBook_btn.setBorderPainted(false);
+        addBook_btn.setFocusPainted(false);
+        addBook_btn.setFocusable(false);
+        addBook_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addBook_btnActionPerformed(evt);
+            }
+        });
+
         jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -177,7 +195,10 @@ public class Dashboard extends javax.swing.JFrame {
                 .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane1)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(addBook_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(Summaries, javax.swing.GroupLayout.DEFAULT_SIZE, 957, Short.MAX_VALUE))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
@@ -187,9 +208,11 @@ public class Dashboard extends javax.swing.JFrame {
                 .addComponent(Header, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(Summaries, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(addBook_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -204,10 +227,15 @@ public class Dashboard extends javax.swing.JFrame {
         new LoginPage();
     }//GEN-LAST:event_logoutBtnActionPerformed
 
+    private void addBook_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBook_btnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_addBook_btnActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Header;
     private javax.swing.JPanel Summaries;
+    private javax.swing.JButton addBook_btn;
     private swings.SummaryCard available_books;
     private swings.BookListTable bookListTable1;
     private swings.SummaryCard borrowed_books;
