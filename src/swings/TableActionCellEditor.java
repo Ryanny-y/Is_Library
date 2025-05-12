@@ -1,4 +1,3 @@
-
 package swings;
 
 import java.awt.Component;
@@ -7,20 +6,22 @@ import javax.swing.JCheckBox;
 import javax.swing.JTable;
 
 public class TableActionCellEditor extends DefaultCellEditor {
-    
-    
-    public TableActionCellEditor() {
+
+    private Dashboard parent;
+    public TableActionCellEditor(Dashboard parent) {
         super(new JCheckBox());
+        this.parent = parent;
     }
+    
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        String status = table.getValueAt(row, 3).toString();
+        
         int book_id = Integer.parseInt(table.getValueAt(row, 0).toString());
-        
-        DeleteBtn deleteBtn = new DeleteBtn();
-        
+        System.out.println(String.valueOf(row));
+        DeleteBtn deleteBtn = new DeleteBtn(parent, book_id);
+
         return deleteBtn;
     }
-    
+
 }

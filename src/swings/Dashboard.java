@@ -22,8 +22,15 @@ public class Dashboard extends javax.swing.JFrame {
         cardInit();
         bookInit();
         bookListTable1.getColumnModel().getColumn(6).setCellRenderer(new TableActionCellRender());
-        bookListTable1.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor());
+        bookListTable1.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(this));
         setVisible(true);
+    }
+    
+    public void refetchBooks() {
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) bookListTable1.getModel();
+        model.setRowCount(0);
+        
+        bookInit();
     }
 
     private void cardInit() {
