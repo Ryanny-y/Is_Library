@@ -236,6 +236,7 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void addBook_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBook_btnActionPerformed
         // TODO add your handling code here:
+        new AddBook(this);
     }//GEN-LAST:event_addBook_btnActionPerformed
 
 
